@@ -1,0 +1,21 @@
+name: LC Digital Auto-Deploy
+on:
+  push:
+    paths:
+      - 'audit-engine/**'
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Configure AWS
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+      - name: Push to Cloud
+        run: |
+          cd audit-engine
+          zip -r function.zip .
+          aws lambda update-function-code --function-name API_relay --zip-file fileb://function.zip
